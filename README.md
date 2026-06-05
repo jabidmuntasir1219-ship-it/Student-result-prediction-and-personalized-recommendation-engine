@@ -68,3 +68,17 @@ This project addresses and corrects several classic flaws found in tutorial-leve
   +----------------------------------+
   |   Final Personalized Blueprint   |
   +----------------------------------+
+
+## 🛠️ Prerequisites & Data Environment
+
+Before setting up and executing the pipeline, ensure your environment meets the structural, operational, and data requirements defined below.
+
+### 1. Software & Environment Constraints
+* **Python Version:** `Python >= 3.8` (Required for advanced `scikit-learn` partitioning pipelines and `shap` compatibility).
+* **Operating System:** Cross-platform compatibility verified across Linux, macOS, and Windows environments.
+
+### 2. Core Dependencies
+The system relies on a clean data science stack. You can install all runtime dependencies via the accompanying `requirements.txt`:
+```bash
+pip install pandas numpy scikit-learn
+
