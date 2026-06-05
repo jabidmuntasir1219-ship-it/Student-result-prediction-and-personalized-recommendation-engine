@@ -125,8 +125,108 @@ def generate_live_report(user_features, input_score, model, explainer=None):
         }).sort_values(by='Contribution', key=abs, ascending=False)
         
         for _, row in contributions.head(3).iterrows():
-            impact = "ইতিবাচক (+)" if row['Contribution'] > 0 else "নেতিবাচক (-)"
-            print(f"    * {row['Feature']}: {abs(row['Contribution']):.2f} পয়েন্ট {impact} প্রভাব ফেলছে।")
+            impact = "positive (+)" if row['Contribution'] > 0 else "negative (-)"
+            print(f"    * {row['Feature']}: {abs(row['Contribution']):.2f} points {impact} impact.")
+    else:
+        print("[>] Diagnostic Layer (Internal Feature Importance Fallback Engine):")
+        importances = model.feature_importances_
+        fallback_df = pd.DataFrame({
+            'Feature': features,
+            'Importance': importances
+        }).sort_values(by='Importance', ascending=False)
+        
+        print("    (Using trained model weights to isolate top driver attributes for your profile)")
+        for _, row in fallback_df.head(3).iterrows():
+            print(f"    * {row['Feature']}: Global feature importance influence weight is {row['Importance']*100:.1f}%.")
+    print()
+
+    print("[>] Prescriptive Recommendations (What-If Simulations):")
+    scenarios = {
+        "Increase study hours by 2": {"study_hours": min(16, user_features["study_hours"] + 2)},
+        "Improve attendance to 95%": {"attendance": max(95, user_features["attendance"])},
+        "Sleep strictly 8 hours": {"sleep_hours": 8},
+        "Reduce screen time by 2 hours": {"screen_time": max(1, user_features["screen_time"] - 2)},
+        "Revise 2 more times": {"revision_frequency": min(5, user_features["revision_frequency"] + 2)}
+    }
+
+    best_action = "Maintain current routine"
+    max_improvement = 0
+
+    for action_name, tweaked_feature in scenarios.items():
+        simulated_state = user_features.copy()
+        simulated_state.update(tweaked_feature)
+
+        simulated_df = pd.DataFrame([simulated_state])[features]
+        simulated_pred = model.predict(simulated_df)[0]
+        improvement = simulated_pred - baseline_pred
+
+        if improvement > max_improvement:
+            max_improvement = improvement
+            best_action = action_name
+            
+        sign = "+" if improvement > 0 else ""
+        print(f"    {sign}{improvement:.1f} pts -> If you: {action_name}")
+
+    print(f"\n>> MACHINE LEARNING OPTIMAL DIRECTIVE: {best_action}")
+    print(f">> EXPECTED NEXT WEEK BOOST: +{max_improvement:.1f} points")
+    print("="*60 + "\n")
+
+def get_validated_input(prompt, min_val, max_val, is_int=False):
+    while True:
+        try:
+            val_type = "Integer" if is_int else "Float/Number"
+            user_in = input(f"{prompt} ({val_type} between {min_val} and {max_val}): ")
+            val = int(user_in) if is_int else float(user_in)
+            if min_val <= val <= max_val:
+                return val
+            print(f"    [Validation Error] Input must be strictly between {min_val} and {max_val}. Try again.")
+        except ValueError:
+            print(f"    [Type Error] Invalid data type. Please enter a valid numerical value.")
+
+def run_interactive_session():
+    print("Enter your exact performance data for the current week:")
+    
+    input_score = get_validated_input("1. Current Week Final Score", 0, 100, is_int=True)
+    
+    inputs = {}
+    inputs["study_hours"] = get_validated_input("2. Study Hours per week", 2, 16)
+    inputs["attendance"] = get_validated_input("3. Attendance Rate Percentage", 40, 100)
+    inputs["sleep_hours"] = get_validated_input("4. Average Sleep Hours", 3, 10)
+    inputs["screen_time"] = get_validated_input("5. Daily Screen Time Hours", 1, 12)
+    inputs["homework_completion"] = get_validated_input("6. Homework Completed %", 10, 100)
+    inputs["previous_score"] = float(input_score)
+    inputs["class_test_avg"] = get_validated_input("7. Class Test Average", 40, 100)
+    inputs["attendance_trend"] = get_validated_input("8. Attendance Trend (1=Improving, 0=Declining)", 0, 1, is_int=True)
+    inputs["study_consistency"] = get_validated_input("9. Study Consistency (1=Consistent, 0=Inconsistent)", 0, 1, is_int=True)
+    inputs["stress_level"] = get_validated_input("10. Current Stress Level (1-5)", 1, 5, is_int=True)
+    inputs["class_participation"] = get_validated_input("11. Class Participation Score (1-5)", 1, 5, is_int=True)
+    inputs["revision_frequency"] = get_validated_input("12. Weekly Revision Count", 0, 5, is_int=True)
+    inputs["assignment_delay"] = get_validated_input("13. Number of Delayed Assignments", 0, 6, is_int=True)
+    inputs["weekend_study"] = get_validated_input("14. Weekend Study Hours", 0, 8)
+    
+    inputs["historical_test_avg"] = (inputs["class_test_avg"] + inputs["previous_score"]) / 2
+
+    generate_live_report(inputs, input_score, model, tree_explainer)
+
+run_interactive_session()
+
+    print("\n" + "="*60)
+    print("                YOUR PERSONALIZED DASHBOARD             ")
+    print("============================================================")
+    print(f"Current Week's Base Score: {input_score}")
+    print(f"Predicted Score for Next Week (Without Changes): {baseline_pred:.1f}\n")
+
+    if explainer and SHAP_AVAILABLE:
+        print("[>] Diagnostic Layer (SHAP Dynamic Impact Analysis):")
+        shap_values = explainer(current_state_df)
+        contributions = pd.DataFrame({
+            'Feature': features,
+            'Contribution': shap_values.values[0]
+        }).sort_values(by='Contribution', key=abs, ascending=False)
+        
+        for _, row in contributions.head(3).iterrows():
+            impact = "positive (+)" if row['Contribution'] > 0 else "negative (-)"
+            print(f"    * {row['Feature']}: {abs(row['Contribution']):.2f} point {impact} প্রভাব ফেলছে।")
     else:
         print("[>] Diagnostic Layer (Internal Feature Importance Fallback Engine):")
         importances = model.feature_importances_
