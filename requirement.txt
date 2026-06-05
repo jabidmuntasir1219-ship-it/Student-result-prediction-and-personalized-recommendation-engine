@@ -1,0 +1,29 @@
+# ====================================================================
+# ENGINE CORE RUNTIME DEPENDENCIES
+# ====================================================================
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.2.0
+
+# ====================================================================
+# EXPLAINABLE AI (XAI) LAYER
+# Required for dynamic Shapley game-theoretic diagnostic feature calculations
+# ====================================================================
+shap>=0.42.0
+
+# ====================================================================
+# ENVIRONMENT-SPECIFIC DATA SOURCE REQUIREMENTS
+# ====================================================================
+# 
+# 1. SYNTHETIC DATA GENERATION BLOCK:
+#    - No external files required. 
+#    - Handled natively in runtime engine initialization code via 
+#      numpy-seeded randomized longitudinal simulation matrices.
+#
+# 2. REAL-WORLD PRODUCTION DATA INGESTION:
+#    - For real user application, standard structured CSV, JSON telemetry 
+#      extracts, or SQL databases are required.
+#    - Ensure input data follows strict tracking schema matching the 
+#      15 core time-aware relational performance dimensions.
+#    - Production-safe string-to-numeric casting and out-of-bounds 
+#      validation guardrails are enforced natively.
