@@ -1,70 +1,63 @@
 # Time-Aware Personalized Student Blueprint & Recommendation Engine
 
-An enterprise-grade, longitudinal machine learning pipeline designed to track, explain, and optimize student performance over time. This repository implements a robust prescriptive analytics engine that moves beyond static descriptive metrics. It predicts a student's next-week score based on sequential behavioral features, leverages game-theoretic explanations (SHAP), and executes real-time counterfactual "What-If" simulations to output highly personalized action plans.
-
-> ⚠️ **Data Source Disclaimer**: This repository functions out-of-the-box as a **Synthetic Demo/Prototype** using algorithmically simulated student life-logging patterns. While the pipeline architecture is production-ready, testing it against real-world human behaviors requires linking it to authentic institutional datasets or unified student logs.
+A machine learning prototype that predicts a student’s **next-week academic performance** from recent academic and behavioral inputs, then generates **personalized recommendations** using what-if simulation and explainable AI techniques.
 
 ---
 
-## 🚀 Key Architectural Upgrades
+## Overview
 
-This project addresses and corrects several classic flaws found in tutorial-level machine learning implementations:
+This project is a **time-aware personalized student performance prediction system** built with Python and scikit-learn.  
+It uses synthetic longitudinal student data to train a **RandomForestRegressor** that predicts the next week’s score based on a student’s current academic state.
 
-* **Leakage-Free Validation (`GroupShuffleSplit`):** Traditional random train/test splits corrupt longitudinal datasets by spreading a single student's chronological history across both train and test partitions (causing artificial memorization). This pipeline enforces strict isolation by grouping records by `student_id`.
-* **Time-Aware Context Extraction:** To capture behavioral patterns over a shifting timeline, the engine synthesizes rolling feature states (`historical_test_avg`) alongside forward-shifted regression targets ($Week \ t \rightarrow Week \ t+1$).
-* **Dual-Layer Explainability (SHAP + Dynamic Fallback):** Integrates Shapley Additive exPlanations to diagnose the exact root causes behind a student's baseline prediction. If the heavy `shap` library is missing in production, a mathematical fallback layer instantly activates using internal model weights to prevent runtime crashes.
-* **Prescriptive Counterfactual Engine:** Instead of executing fragile, hardcoded logical rules (e.g., `if sleep < 6`), the engine runs multiple concurrent simulations using the trained model to find the single behavior alteration yielding the maximum mathematical score increase.
-* **Production-Grade Guardrails:** Features strict, type-safe range validation on all real-time terminal inputs to fully eliminate out-of-bounds anomalies or unexpected system crashes.
+The system also includes:
+- **Explainability** with SHAP when available.
+- A **fallback feature-importance layer** when SHAP is not installed.
+- A **personalized recommendation engine** that simulates changes in study habits and predicts the effect on performance.
+- **Validation checks** for user input.
+- **Metric logging** to save model evaluation results.
 
 ---
 
-## 🛠️ System Architecture
+## Key Features
 
-```text
-  +---------------------------------------+
-  | Synthetic Longitudinal Data Generator |
-  +---------------------------------------+
-                      |
-                      v
-  +---------------------------------------+
-  |   Time-Aware Feature Engineering &    |
-  |   Target Alignment (Shift Logic)      |
-  +---------------------------------------+
-                      |
-                      v
-  +---------------------------------------+
-  |  GroupShuffleSplit (Leakage Control)  |
-  +---------------------------------------+
-           /                     \
-          v                       v
-  +---------------+       +---------------+
-  | Training Set  |       | Isolated Test |
-  +---------------+       +---------------+
-          |                       |
-          v                       v
-  +---------------+       +----------------------------+
-  | RandomForest  |------>| Production Logs            |
-  |   Regressor   |       | (metrics.json Generation)  |
-  +---------------+       +----------------------------+
-          |
-          v
-  +----------------------------------+
-  | Interactive User Input Interface |
-  +----------------------------------+
-          |
-          v
-  +----------------------------------+
-  |       EXPLAINABILITY LAYER       |
-  |  (Dynamic SHAP / Fallback Engine)|
-  +----------------------------------+
-          |
-          v
-  +----------------------------------+
-  | PRESCRIPTIVE COUNTERFACTUAL ENGINE|
-  | ("What-If" Scenario Optimization)|
-  +----------------------------------+
-          |
-          v
-  +----------------------------------+
-  |   Final Personalized Blueprint   |
-  +-----------------------------------
+- Synthetic longitudinal student dataset generation.
+- Time-aware prediction of next-week academic score.
+- Student-level data split using `GroupShuffleSplit`.
+- Random Forest regression model.
+- Model evaluation using:
+  - Mean Absolute Error (MAE)
+  - Root Mean Squared Error (RMSE)
+  - R² Score
+- SHAP-based interpretability support.
+- Fallback explanation using feature importance if SHAP is unavailable.
+- Interactive CLI-based input system.
+- Personalized what-if simulation and recommendation output.
+- Metrics saved to `metrics.json`.
+
+---
+
+## Tech Stack
+
+- Python
+- Pandas
+- NumPy
+- scikit-learn
+- SHAP
+- JSON
+
+---
+
+## Engine Architecture
+
+```mermaid
+graph TD
+A[Synthetic Longitudinal Data Generator] --> B[Time-Aware Feature Engineering and Target Alignment]
+B --> C[GroupShuffleSplit Leakage Control]
+C --> D[Training Set]
+C --> E[Isolated Test Set]
+D --> F[RandomForest Regressor]
+F --> G[Production Logs and metrics.json Generation]
+F --> H[Interactive User Input Interface]
+H --> I[Explainability Layer Dynamic SHAP or Fallback Engine]
+I --> J[Prescriptive Counterfactual Engine What-If Scenario Optimization]
+J --> K[Final Personalized Blueprint]
