@@ -1,0 +1,6 @@
+{
+    "Model": "RandomForestRegressor_TimeAware",
+    "Test_R2_Score": 0.9412,
+    "Test_MAE": 1.4105,
+    "Test_RMSE": 1.8921
+}
