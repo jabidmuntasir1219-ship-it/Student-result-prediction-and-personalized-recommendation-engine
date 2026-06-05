@@ -18,6 +18,21 @@ The system also includes:
 
 ---
 
+## Prerequisites
+
+Before running this project, make sure you have:
+
+- Python 3.9 or later
+- `pip`
+- Basic familiarity with running Python scripts from the terminal
+- A terminal or environment that supports `input()` for interactive use
+
+Optional but recommended:
+- A virtual environment such as `venv`
+- SHAP installed for model explainability
+
+---
+
 ## Key Features
 
 - Synthetic longitudinal student dataset generation.
