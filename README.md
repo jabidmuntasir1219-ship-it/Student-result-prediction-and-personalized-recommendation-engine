@@ -68,7 +68,7 @@ This project addresses and corrects several classic flaws found in tutorial-leve
   +----------------------------------+
   |   Final Personalized Blueprint   |
   +----------------------------------+
-
+---
 ## 🛠️ Prerequisites & Data Environment
 
 Before setting up and executing the pipeline, ensure your environment meets the structural, operational, and data requirements defined below.
@@ -79,6 +79,6 @@ Before setting up and executing the pipeline, ensure your environment meets the 
 
 ### 2. Core Dependencies
 The system relies on a clean data science stack. You can install all runtime dependencies via the accompanying `requirements.txt`:
+
 ```bash
 pip install pandas numpy scikit-learn
-
